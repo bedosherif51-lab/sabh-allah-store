@@ -125,10 +125,11 @@ function closeModal(id){document.getElementById(id).classList.add('hidden')}
 function removeItem(i){cart.splice(i,1);updateCart()}
 function updateCart(){document.getElementById('count').textContent=cart.length;document.getElementById('cartItems').innerHTML=cart.length?cart.map((x,i)=>`<div class="cartitem"><div><b>${x.title}</b><small>${x.color} | ${x.size}</small></div><div>${x.price} ج.م<br><button onclick="removeItem(${i})">حذف</button></div></div>`).join(''):`<p style="color:#718397;text-align:center;padding:20px">السلة فارغة حالياً</p>`;calcTotal()}
 function calcTotal(){const zone=document.getElementById('zone');const ship=zone?Number(zone.value):0;const sum=cart.reduce((a,x)=>a+x.price,0);document.getElementById('total').textContent=(sum?sum+ship:0)+' ج.م'}
-function checkout(e){
+
+function checkout(e) {
   e.preventDefault();
 
-  if(!cart.length){
+  if (!cart.length) {
     alert('السلة فارغة!');
     return;
   }
@@ -138,27 +139,55 @@ function checkout(e){
   const address = document.getElementById('caddress').value.trim();
   const zone = document.getElementById('zone').value;
 
-  if(!name || !phone || !address){
+  if (!name || !phone || !address) {
     alert('من فضلك أكمل بيانات الطلب.');
     return;
   }
 
   const orderNumber = 'SB' + Date.now().toString().slice(-6);
 
-  alert(
-    'تم استلام طلبك بنجاح ✅\n\n' +
-    'رقم الطلب: ' + orderNumber + '\n' +
-    'الاسم: ' + name + '\n' +
-    'الإجمالي: ' + document.getElementById('total').textContent +
-    '\n\nشكرًا لتسوقك من محلات سبح الله ❤️'
-  );
+  const items = cart.map(x =>
+    `${x.title} - ${x.color || ''} - ${x.size || ''} - ${x.price} ج.م`
+  ).join(' | ');
 
-  cart = [];
-  updateCart();
-  document.getElementById('cname').value = '';
-  document.getElementById('cphone').value = '';
-  document.getElementById('caddress').value = '';
-  closeModal('cartModal');
+  const shipping = Number(zone);
+  const total = document.getElementById('total').textContent;
+
+  const data = {
+    orderNumber: orderNumber,
+    name: name,
+    phone: phone,
+    address: address,
+    zone: zone,
+    items: items,
+    shipping: shipping,
+    total: total
+  };
+
+  fetch(scriptURL, {
+    method: 'POST',
+    mode: 'no-cors',
+    body: JSON.stringify(data)
+  })
+  .then(() => {
+    alert(
+      'تم استلام طلبك بنجاح ✅\n\n' +
+      'رقم الطلب: ' + orderNumber +
+      '\n\nشكرًا لتسوقك من محلات سبح الله ❤️'
+    );
+
+    cart = [];
+    updateCart();
+
+    document.getElementById('cname').value = '';
+    document.getElementById('cphone').value = '';
+    document.getElementById('caddress').value = '';
+
+    closeModal('cartModal');
+  })
+  .catch(() => {
+    alert('حصلت مشكلة أثناء إرسال الطلب. حاول مرة أخرى.');
+  });
 }
 function openSub(id){hideAll();document.getElementById('subPage').classList.remove('hidden');['shipping','returns','faq'].forEach(x=>document.getElementById(x).classList.add('hidden'));document.getElementById(id).classList.remove('hidden');window.scrollTo(0,0)}
 function addReview(e){e.preventDefault();reviews.unshift({name:document.getElementById('rname').value,rating:+document.getElementById('rrating').value,text:document.getElementById('rtext').value});drawReviews();e.target.reset();alert('تمت إضافة تعليقك بنجاح')}
