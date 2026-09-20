@@ -165,8 +165,7 @@ function addReview(e){e.preventDefault();reviews.unshift({name:document.getEleme
 function drawReviews(){document.getElementById('reviews').innerHTML=reviews.map(r=>`<div class="review"><div class="stars">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div><strong>${r.name}</strong><p>"${r.text}"</p></div>`).join('')}
 function scrollToContact(){home();setTimeout(()=>document.getElementById('contact').scrollIntoView({behavior:'smooth'}),100)}
 document.getElementById('zone').addEventListener('change',calcTotal);drawReviews();updateCart();
-const scriptURL = 'https://script.google.com/macros/s/AKfycbzVNZCZQKkEPT5-YdNCHGqvcoefZmht5OCuGgJ619kK0J8VvO0wXpkSTc7Ds4A-3YJF/exec';
-
+const scriptURL = 'https://script.google.com/macros/s/AKfycbxwRboW7HBVUkHzrVMxK9wAdFbWi_rXy9V_Leh8dwRVHjqPUxnh1GJDXxkVro9tqQOW/exec';
 </script>
 </body>
 </html>
