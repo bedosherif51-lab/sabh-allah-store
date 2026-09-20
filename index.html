@@ -145,6 +145,11 @@ function checkout(e) {
     return;
   }
 
+  // إظهار جاري الإرسال فورًا
+  const button = e.submitter;
+  button.disabled = true;
+  button.innerHTML = '⏳ جاري إرسال الطلب...';
+
   const orderNumber = 'SB' + Date.now().toString().slice(-6);
 
   const items = cart.map(x =>
@@ -171,25 +176,41 @@ function checkout(e) {
     body: JSON.stringify(data)
   })
   .then(() => {
-    alert(
-      'تم استلام طلبك بنجاح ✅\n\n' +
-      'رقم الطلب: ' + orderNumber +
-      '\n\nشكرًا لتسوقك من محلات سبح الله ❤️'
-    );
 
-    cart = [];
-    updateCart();
+    button.innerHTML = '✅ تم إرسال الطلب بنجاح';
 
-    document.getElementById('cname').value = '';
-    document.getElementById('cphone').value = '';
-    document.getElementById('caddress').value = '';
+    setTimeout(() => {
+      alert(
+        'تم إرسال طلبك بنجاح ✅\n\n' +
+        'رقم الطلب: ' + orderNumber +
+        '\n\nشكرًا لتسوقك من محلات سبح الله ❤️'
+      );
 
-    closeModal('cartModal');
+      cart = [];
+      updateCart();
+
+      document.getElementById('cname').value = '';
+      document.getElementById('cphone').value = '';
+      document.getElementById('caddress').value = '';
+
+      closeModal('cartModal');
+
+      button.disabled = false;
+      button.innerHTML = '<i class="fa-solid fa-check"></i> تأكيد الطلب';
+
+    }, 700);
+
   })
   .catch(() => {
-    alert('حصلت مشكلة أثناء إرسال الطلب. حاول مرة أخرى.');
+
+    button.disabled = false;
+    button.innerHTML = '<i class="fa-solid fa-check"></i> تأكيد الطلب';
+
+    alert('حدثت مشكلة أثناء إرسال الطلب، حاول مرة أخرى.');
   });
 }
+
+      
 function openSub(id){hideAll();document.getElementById('subPage').classList.remove('hidden');['shipping','returns','faq'].forEach(x=>document.getElementById(x).classList.add('hidden'));document.getElementById(id).classList.remove('hidden');window.scrollTo(0,0)}
 function addReview(e){e.preventDefault();reviews.unshift({name:document.getElementById('rname').value,rating:+document.getElementById('rrating').value,text:document.getElementById('rtext').value});drawReviews();e.target.reset();alert('تمت إضافة تعليقك بنجاح')}
 function drawReviews(){document.getElementById('reviews').innerHTML=reviews.map(r=>`<div class="review"><div class="stars">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div><strong>${r.name}</strong><p>"${r.text}"</p></div>`).join('')}
